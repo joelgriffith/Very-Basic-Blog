@@ -11,7 +11,7 @@ function retrieveEntries($db, $id=NULL)
 				WHERE id=?
 				LIMIT 1";
 		$stmt = $db->prepare($sql);
-		$stmt->exectute(array($_GET['id']));
+		$stmt->execute(array($_GET['id']));
 
 		// Save the returned entry array
 		$e = $stmt->fetch();
@@ -53,7 +53,7 @@ function retrieveEntries($db, $id=NULL)
 	array_push($e, $fulldisp);
 
 	return $e;
-}
+};
 
 function sanitizeData($data)
 {
@@ -69,6 +69,6 @@ function sanitizeData($data)
 	{
 		return array_map('sanitizeData', $data);
 	}
-}
+};
 
 ?>

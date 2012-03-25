@@ -22,7 +22,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'
 	$id_obj->closeCursor();
 
 	// Redirect new post!
-	header('Location: ../admin.php?id=' .$id[0]);
+	header('Location: ../?id=' .$id[0]);
 	exit;
 }
 
