@@ -1,17 +1,17 @@
 <?php
 
-function retrieveEntries($db, $id=NULL)
+function retrieveEntries($db, $page, $url=NULL)
 {
 	// If an entry ID was supplied, load the associated entry
-	if(isset($id))
+	if(isset($url))
 	{
 		// Load the specific entry
-		$sql = "SELECT title, entry
+		$sql = "SELECT id, page, title, entry
 				FROM entries
-				WHERE id=?
+				WHERE url=?
 				LIMIT 1";
 		$stmt = $db->prepare($sql);
-		$stmt->execute(array($_GET['id']));
+		$stmt->execute(array($url));
 
 		// Save the returned entry array
 		$e = $stmt->fetch();
@@ -23,20 +23,28 @@ function retrieveEntries($db, $id=NULL)
 	// Otherwise, load all entries
 	else
 	{
-		$sql = "SELECT id, title
+		$sql = "SELECT id, page, title, entry, url
 				FROM entries
+				WHERE page=?
 				ORDER BY created DESC";
+		$stmt = $db->prepare($sql);
+		$stmt->execute(array($page));
+
+		$e = NULL; // Declare null to avoid errors.
 
 		// Loop through all entries
-		foreach($db->query($sql) as $row){
-			$e[] = array (
-				'id' => $row['id'],
-				'title' => $row['title']
-				);
+		while($row = $stmt->fetch()){
+			if($page == "blog")
+			{
+				$e[] = $row;
+				$fulldisp = 0;
+			}
+			else
+			{
+				$e[] = $row;
+				$fulldisp = 1;
+			}
 		}
-
-		// Set the fulldisp flag for multiple entries
-		$fulldisp = 0;
 
 		// If no entry is returned, send a full message
 		if(!is_array($e))
@@ -44,7 +52,7 @@ function retrieveEntries($db, $id=NULL)
 			$fulldisp = 1;
 			$e = array (
 				'title' => 'No Entries Yet!',
-				'entry' => '<a href="/admin.php">Post an Entry!</a>'
+				'entry' => '<a href="/simple_blog/admin/">Post an Entry!</a>'
 				);
 		}
 	}
@@ -53,7 +61,7 @@ function retrieveEntries($db, $id=NULL)
 	array_push($e, $fulldisp);
 
 	return $e;
-};
+}
 
 function sanitizeData($data)
 {
@@ -69,6 +77,15 @@ function sanitizeData($data)
 	{
 		return array_map('sanitizeData', $data);
 	}
-};
+}
 
+function makeURL($title)
+{
+	$patterns = array(
+		'/\s+/',
+		'/(?!-)\W+/'
+	);
+	$replacements = array( '-', '');
+	return preg_replace($patterns, $replacements, strtolower($title));
+}
 ?>

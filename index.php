@@ -6,11 +6,20 @@
 	// Access Database
 	$db = new PDO(DB_INFO, DB_USER, DB_PASS);
 
-	// Check for an entry ID in the url
-	$id = (isset($_GET['id'])) ? (int) $_GET['id'] : NULL;
+	// Check for page ID, sanitize data
+	if(isset($_GET['page']))
+	{
+		$page = $_GET['page'];
+	}
+	else
+	{
+		$page = 'blog';
+	}
+	// Check for an entry url in the url
+	$url = (isset($_GET['url'])) ? $_GET['url'] : NULL;
 
 	// Load entries
-	$e = retrieveEntries($db, $id);
+	$e = retrieveEntries($db, $page, $url);
 
 	// Retrieve full display flag from $e array (last item)
 	$fulldisp = array_pop($e);
@@ -23,13 +32,18 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-	<link rel="stylesheet" href="/~joelgriffith/blog/css/default.css" type="text/css" />
+	<link rel="stylesheet" href="/simple_blog/css/default.css" type="text/css" />
 	<title> Simple Blog </title>
 </head>
 
 <body>
 	<h1>Basic Blog</h1>
-
+	
+	<ul id="menu">
+		<li><a href="/simple_blog/blog/">Blog</a></li>
+		<li><a href="/simple_blog/about/">About the Author</a></li>
+	</ul>
+	
 	<div id="entries">
 		
 		<?php
@@ -38,12 +52,16 @@
 		if ($fulldisp==1)
 		{
 
+			// Get the URL if one wasn't passed
+			$url = (isset($url)) ? $url : $e['url'];
 		?>
 			<h2><?php echo $e['title'] ?></h2>
 			<p><?php echo $e['entry'] ?></p>
+			<?php if ($page=='blog'): ?>
 			<p class="backlink">
 				<a href="./">Back to Latest Entries</a>
 			</p>
+			<? endif; ?>
 
 		<?php
 		
@@ -57,18 +75,21 @@
 
 		?>
 			<p>
-				<a href="?id=<?php echo $entry['id'] ?>">
+				<a href="/simple_blog/<?php echo $entry['page'] ?>/<?php echo $entry['url'] ?>">
 					<?php echo $entry['title'] ?>
 				</a>
 			</p>
 
 		<?php
 			}// End Loop
+		
 		} //End Else Statement
 		?>
 
 		<p class="backlink">
-			<a href="admin.php">Post a New Entry</a>
+			<a href="/simple_blog/admin/<?php echo $page ?>">
+				Post a New Entry
+			</a>
 		</p>
 
 	</div>
