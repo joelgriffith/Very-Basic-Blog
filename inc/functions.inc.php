@@ -1,6 +1,6 @@
 <?php
 
-function retrieveEntries($db, $page, $url=NULL)
+function retrieveEntries ($db, $page, $url=NULL)
 {
 	// If an entry ID was supplied, load the associated entry
 	if(isset($url))
@@ -63,7 +63,47 @@ function retrieveEntries($db, $page, $url=NULL)
 	return $e;
 }
 
-function sanitizeData($data)
+function deleteEntry($db, $url)
+{
+	$sql = "DELETE FROM entries
+			WHERE url=?
+			LIMIT 1";
+	$stmt = $db->prepare($sql);
+	return $stmt->execute(array($url));
+}
+
+function adminLinks ($page, $url)
+{
+	// Format the link to be followed for each option
+	$editURL = "/simple_blog/admin/$page/$url";
+	$deleteURL = "/simple_blog/admin/delete/$url";
+	
+	// Make a hyperlink and add it to an array
+	$admin['edit'] = "<a href=\"$editURL\">Edit</a>";
+	$admin['delete'] = "<a href=\"$deleteURL\">Delete</a>";
+
+	return $admin;
+}
+
+function confirmDelete ($db, $url)
+{
+	$e = retrieveEntries($db, '', $url);
+
+	return <<<FORM
+<form action = "/simple_blog/admin.php" method = "post">
+	<fieldset>
+		<legend>Are you Sure?</legend>
+		<p>Are you sure you want to delete the entry "$e[title]"?</p>
+		<input type = "submit" name = "submit" value = "Yes" />
+		<input type = "submit" name = "submit" value = "No" />
+		<input type = "hidden" name = "action" value = "delete" />
+		<input type = "hidden" name = "url" value = "$url" />
+	</fieldset>
+</form>
+FORM;
+}
+
+function sanitizeData ($data)
 {
 	//If data is not an array, run strip_tags()
 	if(!is_array($data))
@@ -79,7 +119,7 @@ function sanitizeData($data)
 	}
 }
 
-function makeURL($title)
+function makeURL ($title)
 {
 	$patterns = array(
 		'/\s+/',
