@@ -3,6 +3,9 @@
 // Include the functions so you can create a URL
 include_once 'functions.inc.php';
 
+// Include the image uploader class
+include_once 'images.inc.php';
+
 // Checks to make sure user put in all fields and posted
 if($_SERVER['REQUEST_METHOD'] == 'POST'
 	&& $_POST['submit'] == 'Save Entry'
@@ -12,6 +15,36 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'
 {
 	// Create a URL to save in the database
 	$url = makeURL($_POST['title']);
+
+	// Check to see if an image has been uploaded by the user:
+	if(isset($_FILES['image']['tmp_name']))
+	{
+		try
+		{
+			// Instantiate the class and set a save path:
+			$img = new ImageHandler("/simple_blog/images");
+
+			// Process the file and store the returned path:
+			$img_path = $img->processUploadedImage($_FILES['image']);
+
+			// Output the uploaded image as it was saved:
+			echo '<img src="', $img_path, '" /></br>';
+		}
+		catch(Exception $e)
+		{
+			// If an error occured, output an error message:
+			die($e->getMessage());
+		}
+	}
+	else
+	{
+		// Set the image to NULL to avoid errors:
+		$img_path = NULL;
+	}
+
+	// Output the saved image path;
+	echo "Image Path:", $img_path, "</br>";
+	exit; // Stops execution before saving entry.
 
 	// Accesses database credentials and connect to database
 	include_once 'db.inc.php';
