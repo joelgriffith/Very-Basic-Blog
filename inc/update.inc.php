@@ -27,8 +27,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'
 			// Process the file and store the returned path:
 			$img_path = $img->processUploadedImage($_FILES['image']);
 
-			// Output the uploaded image as it was saved:
-			echo '<img src="', $img_path, '" /></br>';
 		}
 		catch(Exception $e)
 		{
@@ -42,10 +40,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'
 		$img_path = NULL;
 	}
 
-	// Output the saved image path;
-	echo "Image Path:", $img_path, "</br>";
-	exit; // Stops execution before saving entry.
-
 	// Accesses database credentials and connect to database
 	include_once 'db.inc.php';
 	$db = new PDO (DB_INFO, DB_USER, DB_PASS);
@@ -54,13 +48,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'
 	if(!empty($_POST['id']))
 	{
 		$sql = "UPDATE entries
-				SET title = ?, entry = ?, url = ?
+				SET title = ?, image = ?, entry = ?, url = ?
 				WHERE id = ?
 				LIMIT 1";
 		$stmt = $db->prepare($sql);
 		$stmt->execute(
 			array(
 				$_POST['title'],
+				$img_path,
 				$_POST['entry'],
 				$url,
 				$_POST['id']
@@ -72,13 +67,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'
 	// Otherwise, save the post into the database as a new entry.
 	else
 	{
-		$sql = "INSERT INTO entries (page, title, entry, url) 
-				VALUES (?,?,?,?)";
+		$sql = "INSERT INTO entries (page, title, image, entry, url) 
+				VALUES (?, ?, ?, ?, ?)";
 		$stmt = $db->prepare($sql);
 		$stmt->execute(
 			array(
-				$_POST['page'], 
-				$_POST['title'], 
+				$_POST['page'],
+				$_POST['title'],
+				$img_path,
 				$_POST['entry'], 
 				$url
 				)
@@ -89,7 +85,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'
 	$page = htmlentities(strip_tags($_POST['page']));
 
 	// Redirect new post!
-	header('Location: /simple_blog/'.$page.'/'.$url);
+	header('Location: /simple_blog/' . $page . '/' . $url);
 	exit;
 }
 

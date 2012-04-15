@@ -6,7 +6,7 @@ function retrieveEntries ($db, $page, $url=NULL)
 	if(isset($url))
 	{
 		// Load the specific entry
-		$sql = "SELECT id, page, title, entry
+		$sql = "SELECT id, page, title, image, entry
 				FROM entries
 				WHERE url=?
 				LIMIT 1";
@@ -23,7 +23,7 @@ function retrieveEntries ($db, $page, $url=NULL)
 	// Otherwise, load all entries
 	else
 	{
-		$sql = "SELECT id, page, title, entry, url
+		$sql = "SELECT id, page, title, image, entry, url
 				FROM entries
 				WHERE page=?
 				ORDER BY created DESC";

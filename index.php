@@ -27,6 +27,19 @@
 	// Sanitize the data to ensure it's an array
 	$e = sanitizeData($e);
 
+	// Check to see if images are in posts:
+	function formatImage($img=NULL, $alt=NULL)
+	{
+		if(isset($img))
+		{
+			return '<img src="' . $img . '" alt="' . $alt . '" /> ';
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -58,8 +71,12 @@
 			// Generate Edit/Delete Links
 			$admin = adminLinks($page, $url);
 
+			// Format the image if one exists:
+			$img = formatImage($e['image'], $e['title']);
+
 		?>
 			<h2><?php echo $e['title'] ?></h2>
+			<p><?php echo $img ?></p>
 			<p><?php echo $e['entry'] ?></p>
 			<p>
 				<?php echo $admin['edit'] ?>
