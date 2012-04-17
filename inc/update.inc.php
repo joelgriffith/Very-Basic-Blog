@@ -22,7 +22,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'
 		try
 		{
 			// Instantiate the class and set a save path:
-			$img = new ImageHandler("/simple_blog/images");
+			$img = new ImageHandler('/simple_blog/images', array(350,240));
 
 			// Process the file and store the returned path:
 			$img_path = $img->processUploadedImage($_FILES['image']);
