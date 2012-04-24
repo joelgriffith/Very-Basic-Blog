@@ -119,6 +119,11 @@ function sanitizeData ($data)
 	}
 }
 
+function sanitizeComment($input)
+{
+	return htmlentities(strip_tags($input), ENT_QUOTES);
+}
+
 function makeURL ($title)
 {
 	$patterns = array(
@@ -128,4 +133,19 @@ function makeURL ($title)
 	$replacements = array( '-', '');
 	return preg_replace($patterns, $replacements, strtolower($title));
 }
-?>
+
+function createUserForm()
+{
+	return <<<FORM
+<form action="/simple_blog/inc/update.inc.php" method="post">
+	<fieldset>
+		<legend>Create New Administrator</legend>
+			<label>Username<input type="text" name="username" maxlength="75" /></label>
+			<label>Password<input type="password" name="password" /></label>
+			<input type="submit" name="submit" value="Create" />
+			<input type="submit" name="submit" value="Cancel" />
+			<input type="hidden" name="action" value="createuser" />
+	</fieldset>
+</form>
+FORM;
+}

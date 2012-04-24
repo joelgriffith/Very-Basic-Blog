@@ -1,4 +1,7 @@
 <?php
+
+	session_start();
+
 	// Retrieve necessary files
 	include_once 'inc/functions.inc.php';
 	include_once 'inc/db.inc.php';
@@ -60,6 +63,10 @@
 				<li><a href="/simple_blog/about/">About the Author</a></li>
 			</ul>
 		</div>
+
+		<?php if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1) : ?>
+			<p id="control_panel">You are logged in! <a href="/simple_blog/inc/update.inc.php?action=logout">Log out</a>.</p>
+		<?php endif; ?>
 		
 		<div id="entries">
 			
@@ -71,12 +78,30 @@
 
 				// Get the URL if one wasn't passed
 				$url = (isset($url)) ? $url : $e['url'];
-
-				// Generate Edit/Delete Links
-				$admin = adminLinks($page, $url);
-
+				if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1)
+				{
+					// Generate Edit/Delete Links
+					$admin = adminLinks($page, $url);
+				}
+				else
+				{
+					$admin = array('edit' => NULL, 'delete' => NULL);
+				}
 				// Format the image if one exists:
 				$img = formatImage($e['image'], $e['title']);
+
+				if($page=='blog')
+				{
+					// Load the comments!
+					include_once 'inc/comments.inc.php';
+					$comments = new Comments();
+					$comment_disp = $comments->showComments($e['id']);
+					$comment_form = $comments->showCommentForm($e['id']);
+				}
+				else
+				{
+					$comments_form = NULL;
+				}
 
 			?>
 				<h2><?php echo $e['title'] ?></h2>				
@@ -92,7 +117,8 @@
 				<p class="backlink">
 					<a href="./">Back to Latest Entries</a>
 				</p>
-				<? endif; ?>
+				<h3>Comments for this Post</h3>
+				<?php echo $comment_disp, $comment_form; endif; ?>
 
 			<?php
 			
@@ -111,16 +137,19 @@
 					</a>
 				</p>
 
-			<?php
-				}// End Loop
-			
+			<?php 
+				}// End Loop 
 			} //End Else Statement
 			?>
 
 			<p class="backlink">
+			<?php
+			if($page == 'blog' && isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1):
+			?>
 				<a href="/simple_blog/admin/<?php echo $page ?>">
 					Post a New Entry
 				</a>
+			<?php endif; ?>
 			</p>
 			<p class="backlink">
 				<a href="/simple_blog/feeds/rss.php">

@@ -7,7 +7,7 @@ class ImageHandler
 	public $max_dims;
 
 	// Set the $save_dir and image dimensions once initialized:
-	public function _construct($save_dir, $max_dims = array(350, 240))
+	public function __construct($save_dir, $max_dims = array(350, 240))
 	{
 		$this->save_dir = $save_dir;
 		$this->max_dims = $max_dims;
@@ -49,10 +49,10 @@ class ImageHandler
 		}
 
 		// Create the full path to the image for saving and loading:
-		$filepath = $this->save_dir . '/simple_blog/images/' . $name;
+		$filepath = $this->save_dir . $name;
 
 		// Store the absolute path to move the image:
-		$absolute = $_SERVER['DOCUMENT_ROOT'] . '/' . $filepath;
+		$absolute = $_SERVER['DOCUMENT_ROOT'] . $filepath;
 
 		// Aaaaaand now we'll save the image:
 		if(!move_uploaded_file($tmp, $absolute))
@@ -123,7 +123,7 @@ class ImageHandler
 	private function checkSaveDir()
 	{
 		// Determines the path to check:
-		$path = $_SERVER['DOCUMENT_ROOT'] . '/' . $this->save_dir . '/simple_blog/images/';
+		$path = $_SERVER['DOCUMENT_ROOT'] . $this->save_dir;
 
 		// Check to see if directory exists:
 		if(!is_dir($path))
@@ -149,8 +149,7 @@ class ImageHandler
 	{
 		// Get the dimensions for resizing:
 		list($src_w, $src_h) = getimagesize($img);
-		$max_w = 350;
-		$max_h = 240;
+		list($max_w, $max_h) = $this->max_dims;
 
 		// Check that the image is bigger than the maximum dimensions:
 		if($src_w > $max_w || $src_h > $max_h)
