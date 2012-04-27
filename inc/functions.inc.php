@@ -63,8 +63,33 @@ function retrieveEntries ($db, $page, $url=NULL)
 	return $e;
 }
 
+function deleteImage($db, $url)
+{
+	// Select the image from the databes:
+	$sql = "SELECT image
+			FROM entries
+			WHERE url=?
+			LIMIT 1";
+	$stmt = $db->prepare($sql);
+	$stmt->execute(array($url));
+	$e = $stmt->fetch();
+	$img = $e['image'];
+	$imgPath = $_SERVER['DOCUMENT_ROOT'] . $img;
+
+	// Check to see if there is an image:
+	if(isset($img))
+	{
+		// Delete the Image:
+		unlink($imgPath);
+	}
+}
+
 function deleteEntry($db, $url)
 {
+	// Delete any Images first:
+	deleteImage($db, $url);
+
+	// Then Delete the Post:
 	$sql = "DELETE FROM entries
 			WHERE url=?
 			LIMIT 1";

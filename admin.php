@@ -19,8 +19,11 @@ if(isset($_POST['action']) && $_POST['action'] == 'delete')
 	if($_POST['submit'] == 'Yes')
 	{
 		$url = htmlentities(strip_tags($_POST['url']));
+
+		// Then proceed to delete the post:
 		if(deleteEntry($db, $url))
 		{
+
 			header("Location: /simple_blog");
 			exit;
 		}
