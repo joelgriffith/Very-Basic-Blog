@@ -84,6 +84,26 @@ function deleteImage($db, $url)
 	}
 }
 
+function searchEntries($db, $query)
+{
+	$sql = "SELECT id, page, title, image, entry, url, created
+			FROM entries
+			WHERE entry LIKE ?
+			ORDER BY created DESC";
+	$stmt = $db->prepare($sql);
+	$stmt->execute(array($query));
+
+	// Loop through all entries
+	while($row = $stmt->fetch())
+	{
+		$e[] = $row;
+		$fulldisp = 0;
+	}
+	// Return loaded data
+	array_push($e, $fulldisp);
+	return $e;
+}
+
 function deleteEntry($db, $url)
 {
 	// Delete any Images first:

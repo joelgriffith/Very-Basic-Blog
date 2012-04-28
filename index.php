@@ -18,11 +18,27 @@
 	{
 		$page = 'blog';
 	}
+	
 	// Check for an entry url in the url
-	$url = (isset($_GET['url'])) ? $_GET['url'] : NULL;
-
+	if(isset($_GET['url']) && $page != 'about')
+	{
+		// Select the post:
+		$url = $_GET['url'];
+	}
+	elseif($page == 'about')
+	{
+		// Since there is only one 'about' post, select it:
+		$url = 'about';
+	}
+	else
+	{
+		// Else NULL to load all posts:
+		$url = NULL;
+	}
+	
 	// Load entries
 	$e = retrieveEntries($db, $page, $url);
+	
 
 	// Retrieve full display flag from $e array (last item)
 	$fulldisp = array_pop($e);
@@ -63,6 +79,7 @@
 				<li><a href="/simple_blog/about/">About the Author</a></li>
 			</ul>
 		</div>
+		<div id="search">
 
 		<?php if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1) : ?>
 			<p id="control_panel">You are logged in! <a href="/simple_blog/inc/update.inc.php?action=logout">Log out</a>.</p>
@@ -71,13 +88,15 @@
 		<div id="entries">
 			
 			<?php
-			
+
 			// Check if full display is needed.
-			if ($fulldisp==1)
+			if ($fulldisp == 1)
 			{
 
 				// Get the URL if one wasn't passed
 				$url = (isset($url)) ? $url : $e['url'];
+				
+				// Check to see if admin is logged in:
 				if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == 1)
 				{
 					// Generate Edit/Delete Links
@@ -87,10 +106,11 @@
 				{
 					$admin = array('edit' => NULL, 'delete' => NULL);
 				}
+				
 				// Format the image if one exists:
 				$img = formatImage($e['image'], $e['title']);
 
-				if($page=='blog')
+				if($page == 'blog')
 				{
 					// Load the comments!
 					include_once 'inc/comments.inc.php';
